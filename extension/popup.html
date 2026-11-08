@@ -1,0 +1,123 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Video Party</title>
+    <style>
+      :root {
+        --bg: #ffffff;
+        --fg: #111827;
+        --muted: #6b7280;
+        --border: #e5e7eb;
+        --accent: #4f46e5;
+        --accent-fg: #ffffff;
+        --ok: #16a34a;
+        --err: #dc2626;
+        color-scheme: light dark;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #111827;
+          --fg: #f9fafb;
+          --muted: #9ca3af;
+          --border: #374151;
+          --accent: #818cf8;
+          --accent-fg: #111827;
+        }
+      }
+      body {
+        width: 300px;
+        margin: 0;
+        padding: 16px;
+        background: var(--bg);
+        color: var(--fg);
+        font: 13px/1.45 system-ui, sans-serif;
+      }
+      h1 { font-size: 15px; margin: 0 0 12px; }
+      .row { display: flex; gap: 8px; margin: 8px 0; }
+      input {
+        flex: 1;
+        min-width: 0;
+        padding: 7px 9px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        font-family: ui-monospace, monospace;
+        text-transform: uppercase;
+      }
+      button {
+        padding: 7px 12px;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        background: transparent;
+        color: inherit;
+        font: inherit;
+        cursor: pointer;
+      }
+      button.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+      button.wide { width: 100%; }
+      .muted { color: var(--muted); }
+      .code {
+        font: 600 20px ui-monospace, monospace;
+        letter-spacing: 2px;
+        flex: 1;
+        align-self: center;
+      }
+      .dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); margin-right: 6px; }
+      .dot.ok { background: var(--ok); }
+      .err { color: var(--err); }
+      .sep { text-align: center; margin: 10px 0; }
+      [hidden] { display: none !important; }
+      details { margin-top: 12px; }
+      summary { cursor: pointer; }
+      pre {
+        margin: 6px 0;
+        padding: 6px 8px;
+        max-height: 180px;
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font: 11px/1.4 ui-monospace, monospace;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🎬 Video Party</h1>
+
+    <section id="out">
+      <button id="create" class="primary wide">Start a new party</button>
+      <div class="sep muted">or join a friend</div>
+      <div class="row">
+        <input id="code" placeholder="Room code" maxlength="32" autocomplete="off" />
+        <button id="join">Join</button>
+      </div>
+      <p class="muted">Host: open the video first, then start the party. Joining: this tab will open the same page as your friend.</p>
+    </section>
+
+    <section id="in" hidden>
+      <div class="muted">Room code: share it with your friend</div>
+      <div class="row">
+        <span id="room" class="code"></span>
+        <button id="copy">Copy</button>
+      </div>
+      <p><span id="dot" class="dot"></span><span id="peers"></span></p>
+      <p id="relays" class="muted"></p>
+      <p id="tabinfo" class="muted"></p>
+      <button id="move" class="wide" hidden>Sync this tab instead</button>
+      <div class="row"><button id="leave" class="wide">Leave party</button></div>
+      <details id="logbox" open>
+        <summary class="muted">Event log</summary>
+        <pre id="log"></pre>
+        <button id="copylog">Copy log</button>
+      </details>
+    </section>
+
+    <p id="error" class="err" hidden></p>
+
+    <script src="popup.js"></script>
+  </body>
+</html>
