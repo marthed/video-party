@@ -37,4 +37,4 @@ Anyone who has your room code can join your party and will see your synced tab's
 
 ## Contact
 
-Questions about this policy: **[YOUR CONTACT EMAIL]**
+Questions about this policy: **martinhedlund@live.com**
