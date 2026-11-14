@@ -68,6 +68,8 @@ npm run package      # builds and writes dist/video-party-<version>.zip
 ## Known limitations
 
 - **Strict NATs.** About 10–15% of networks (some corporate networks, some mobile carriers) block direct P2P connections. Those need a TURN relay server, which isn't truly serverless. You can pass `turnConfig` to `joinRoom` in `src/offscreen.js` (Cloudflare and metered.ca have free tiers).
-- **Netflix** and a few other DRM players crash if `video.currentTime` is set directly. Play and pause will work, but seeking would need site-specific code that uses the player's own API.
+- **Supported sites only:** SVT Play, YouTube, Netflix, Disney+, Prime Video, HBO Max and Spotify (`host_permissions` in `extension/manifest.json`). To add a site, add its pattern to both `host_permissions` and the first `content_scripts.matches` (keep them identical), and a display name in `extension/sites.js`.
+- **Netflix** crashes if `video.currentTime` is set directly, so seeks go through Netflix's player API (`extension/netflix-main.js`, which runs in the page's own context). If Netflix changes that internal API, seeking there breaks.
+- **Spotify** is a poor fit: songs play from a media element that's usually not in the page at all, and the page URL doesn't identify the track. Expect it not to work for music.
 - No continuous drift correction yet. If the two videos drift apart (for example after buffering), any play, pause or seek re-syncs them.
 - Videos inside closed shadow DOM aren't detected.

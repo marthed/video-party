@@ -38,7 +38,19 @@ async function render() {
   $('out').hidden = inRoom;
   $('in').hidden = !inRoom;
   showError(state.error);
-  if (!inRoom) return;
+
+  // Without a host permission for a site, tab.url is undefined: unsupported.
+  const current = await activeTab();
+  const supportedHere = isSupportedUrl(current?.url);
+
+  if (!inRoom) {
+    $('create').disabled = !supportedHere;
+    $('unsupported').hidden = supportedHere;
+    $('unsupported').textContent =
+      `To start a party, open a video on ${supportedSiteNames().join(', ')}. ` +
+      `You can join a friend's party from any tab.`;
+    return;
+  }
 
   $('room').textContent = state.roomId;
   $('dot').classList.toggle('ok', state.peers > 0);
@@ -57,10 +69,9 @@ async function render() {
   logEl.textContent = state.log.length ? state.log.join('\n') : 'Nothing yet.';
   logEl.scrollTop = logEl.scrollHeight;
 
-  const current = await activeTab();
   const synced = state.tabId ? await chrome.tabs.get(state.tabId).catch(() => null) : null;
   $('tabinfo').textContent = synced ? `Syncing: ${synced.title}` : '';
-  $('move').hidden = !synced || synced.id === current.id;
+  $('move').hidden = !synced || synced.id === current.id || !supportedHere;
 }
 
 $('create').onclick = () => join(randomCode());

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Video Party",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Watch videos together with friends: play, pause and seeking stay in sync between browsers, peer-to-peer.",
   "minimum_chrome_version": "116",
   "icons": {
@@ -10,7 +10,17 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": ["offscreen", "storage", "tabs", "scripting"],
+  "permissions": ["offscreen", "storage", "scripting"],
+  "host_permissions": [
+    "https://*.svtplay.se/*",
+    "https://*.youtube.com/*",
+    "https://*.netflix.com/*",
+    "https://*.disneyplus.com/*",
+    "https://*.primevideo.com/*",
+    "https://*.hbomax.com/*",
+    "https://*.max.com/*",
+    "https://open.spotify.com/*"
+  ],
   "background": {
     "service_worker": "background.js"
   },
@@ -25,9 +35,24 @@
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
+      "matches": [
+        "https://*.svtplay.se/*",
+        "https://*.youtube.com/*",
+        "https://*.netflix.com/*",
+        "https://*.disneyplus.com/*",
+        "https://*.primevideo.com/*",
+        "https://*.hbomax.com/*",
+        "https://*.max.com/*",
+        "https://open.spotify.com/*"
+      ],
       "js": ["content.js"],
       "all_frames": true,
+      "run_at": "document_idle"
+    },
+    {
+      "matches": ["https://*.netflix.com/*"],
+      "js": ["netflix-main.js"],
+      "world": "MAIN",
       "run_at": "document_idle"
     }
   ]

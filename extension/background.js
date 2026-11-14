@@ -5,6 +5,8 @@
 // extension contexts (background, offscreen, popup), so messages carry a
 // `target` field and each context ignores what isn't meant for it.
 
+importScripts('sites.js'); // isSupportedUrl()
+
 const OFFSCREEN_URL = 'offscreen.html';
 const DEFAULT_STATE = { roomId: null, tabId: null, peers: 0, error: null, relaysOpen: 0, relaysTotal: 0, log: [], syncPending: false };
 const MAX_LOG = 40;
@@ -36,7 +38,7 @@ function sameVideoUrl(a, b) {
     const norm = (u) => {
       const url = new URL(u);
       url.hash = '';
-      ['t', 'start', 'time_continue'].forEach((p) => url.searchParams.delete(p));
+      ['t', 'start', 'time_continue', 'trackId', 'tctx'].forEach((p) => url.searchParams.delete(p));
       url.searchParams.sort();
       return url.href;
     };
@@ -45,7 +47,6 @@ function sameVideoUrl(a, b) {
     return false;
   }
 }
-const isWebUrl = (u) => /^https?:\/\//i.test(u ?? '');
 
 const describe = (e) => `${e.kind} at ${fmt(e.time)} (${e.playing ? 'playing' : 'paused'})`;
 
@@ -92,7 +93,12 @@ async function join(roomId, tabId) {
   const res = await toTab(tabId, { type: 'activate' });
   if (!res) {
     // Tab was opened before the extension was installed/reloaded: inject now.
-    await chrome.scripting.executeScript({ target: { tabId, allFrames: true }, files: ['content.js'] }).catch(() => {});
+    const target = { tabId, allFrames: true };
+    await chrome.scripting.executeScript({ target, files: ['content.js'] }).catch(() => {});
+    const tab = await chrome.tabs.get(tabId).catch(() => null);
+    if (/^https:\/\/([^/]+\.)?netflix\.com\//.test(tab?.url ?? '')) {
+      await chrome.scripting.executeScript({ target, files: ['netflix-main.js'], world: 'MAIN' }).catch(() => {});
+    }
     await toTab(tabId, { type: 'activate' });
   }
   const { peers } = await getState();
@@ -122,7 +128,8 @@ chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
           if (!state.tabId) break;
 
           // Joining: follow the host to the page they're watching.
-          if (ev.kind === 'state' && isWebUrl(ev.url)) {
+          // Only ever navigate to one of the supported sites.
+          if (ev.kind === 'state' && isSupportedUrl(ev.url)) {
             const tab = await chrome.tabs.get(state.tabId).catch(() => null);
             if (tab && !sameVideoUrl(tab.url, ev.url)) {
               addLog(`🔗 Opening friend's page…`);

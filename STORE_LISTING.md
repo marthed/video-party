@@ -23,7 +23,7 @@ Upload `dist/video-party-<version>.zip` (create it with `npm run package`).
 > When anyone in the party presses play, pauses or jumps to another point in the video, it happens for everyone else too, wherever they are.
 >
 > HOW IT WORKS
-> 1. Open a video (YouTube, SVT Play and most sites with a regular HTML5 video player).
+> 1. Open a video on YouTube, SVT Play, Netflix, Disney+, Prime Video, HBO Max or Spotify.
 > 2. Click the Video Party icon and press "Start a new party".
 > 3. Send the room code to your friends.
 > 4. Your friends click the icon, paste the code and press "Join". Their tab opens the same video at the same position.
@@ -31,7 +31,7 @@ Upload `dist/video-party-<version>.zip` (create it with `npm run package`).
 > PRIVATE BY DESIGN
 > • No account or sign-up.
 > • Peer-to-peer: playback sync goes directly between your browsers over an encrypted WebRTC connection, not through our servers. We don't run any.
-> • Only the tab you start or join a party in is synced. The extension does nothing on other pages.
+> • Works only on the supported streaming sites, and only in the tab you start or join a party in. The extension can't access any other website.
 > • No analytics, no tracking, no ads.
 >
 > GOOD TO KNOW
@@ -59,9 +59,8 @@ Upload `dist/video-party-<version>.zip` (create it with `npm run package`).
 |---|---|
 | `offscreen` | Extension service workers cannot create WebRTC connections. An offscreen document (reason: WEB_RTC) holds the peer-to-peer connection that sends playback events between party members. |
 | `storage` | Stores the current party's state (room code, synced tab ID, connection status) in session storage so it survives the service worker being suspended. Cleared when the user leaves the party. |
-| `tabs` | Reads the URL and title of the tab the user chose to sync. The URL is sent to friends joining the party so their tab opens the same video, and the title is shown in the popup. Also used to open the host's video page in a joiner's tab, and to end the party when the synced tab is closed. |
 | `scripting` | Injects the content script into the chosen tab when it was already open before the extension was installed or updated, so the user doesn't need to reload the page to start a party. |
-| Host permission `<all_urls>` (content script) | Videos can be on any website, so the extension can't know the domains in advance. The content script stays inactive unless its tab is the one the user started or joined a party in. It then only listens to the page's `<video>` element for play, pause and seek and applies friends' actions. It also has to run on any site because a joining friend's tab is automatically opened on the host's video page, which can be any domain. |
+| Host permissions (svtplay.se, youtube.com, netflix.com, disneyplus.com, primevideo.com, hbomax.com, max.com, open.spotify.com) | These are the streaming sites whose video players Video Party syncs. On these sites the content script listens to the page's video element for play, pause and seek and applies friends' actions, but only in the tab the user started or joined a party in; in other tabs it stays inactive. The host permission also lets the extension read the synced tab's URL so a joining friend's tab opens the same video. On Netflix, a small script runs in the page to seek through Netflix's own player API, because setting the video position directly crashes Netflix's player. |
 
 **Remote code:** No, I am not using remote code. (All JavaScript, including the Trystero library, is bundled in the package.)
 

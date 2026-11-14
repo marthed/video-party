@@ -2,6 +2,8 @@
 
 _Last updated: November 8, 2026_
 
+Video Party only has access to these sites: SVT Play (svtplay.se), YouTube (youtube.com), Netflix (netflix.com), Disney+ (disneyplus.com), Prime Video (primevideo.com), HBO Max (hbomax.com, max.com) and Spotify (open.spotify.com). It cannot read or change any other website.
+
 Video Party is a browser extension that keeps video playback (play, pause and position) in sync between friends who join the same "party". It has no accounts, no analytics and no servers of its own.
 
 ## What data is handled

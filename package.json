@@ -1,6 +1,6 @@
 {
   "name": "video-party",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "private": true,
   "description": "Chrome extension that syncs play/pause/seek of HTML5 video between browsers, peer-to-peer.",
   "scripts": {

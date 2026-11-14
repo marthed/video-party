@@ -57,6 +57,7 @@
         cursor: pointer;
       }
       button.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+      button:disabled { opacity: 0.45; cursor: not-allowed; }
       button.wide { width: 100%; }
       .muted { color: var(--muted); }
       .code {
@@ -90,6 +91,7 @@
 
     <section id="out">
       <button id="create" class="primary wide">Start a new party</button>
+      <p id="unsupported" class="muted" hidden></p>
       <div class="sep muted">or join a friend</div>
       <div class="row">
         <input id="code" placeholder="Room code" maxlength="32" autocomplete="off" />
@@ -118,6 +120,7 @@
 
     <p id="error" class="err" hidden></p>
 
+    <script src="sites.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>

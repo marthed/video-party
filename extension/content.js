@@ -31,10 +31,27 @@
 
   // ---------- video detection ----------
 
+  // Some players (e.g. Disney+) keep their <video> inside a shadow root, which
+  // document.querySelectorAll can't see. Only walk shadow roots if needed.
+  function findMedia(selector) {
+    const found = [...document.querySelectorAll(selector)];
+    if (found.length) return found;
+    const walk = (root) => {
+      for (const el of root.querySelectorAll('*')) {
+        if (!el.shadowRoot) continue;
+        found.push(...el.shadowRoot.querySelectorAll(selector));
+        walk(el.shadowRoot);
+      }
+    };
+    walk(document);
+    return found;
+  }
+
   function pickVideo() {
     let best = null;
     let bestArea = 0;
-    for (const v of document.querySelectorAll('video')) {
+    const videos = findMedia('video');
+    for (const v of videos) {
       const r = v.getBoundingClientRect();
       const area = r.width * r.height;
       if (area > bestArea) {
@@ -42,7 +59,16 @@
         bestArea = area;
       }
     }
-    return best;
+    // Audio-only players (e.g. Spotify) or a video not laid out yet.
+    return best ?? videos[0] ?? findMedia('audio')[0] ?? null;
+  }
+
+  // Netflix's player crashes if currentTime is set directly; netflix-main.js
+  // (running in the page's own context) seeks through Netflix's API instead.
+  const IS_NETFLIX = /(^|\.)netflix\.com$/.test(location.hostname);
+  function seekTo(v, time) {
+    if (IS_NETFLIX) window.postMessage({ source: 'video-party-netflix', type: 'seek', time }, location.origin);
+    else v.currentTime = time;
   }
 
   function attach(v) {
@@ -135,7 +161,7 @@
 
     const did = [];
     if (Math.abs(v.currentTime - target) > SEEK_THRESHOLD_S) {
-      v.currentTime = target;
+      seekTo(v, target);
       did.push(`seeked to ${formatTime(target)}`);
     }
     if (event.playing && v.paused) {
